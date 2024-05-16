@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:js_util';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   TextEditingController textEditingController = TextEditingController();
   FirestoreService journals = FirestoreService();
+
   void openDialogBox({String? docID}) {
     showDialog(
       context: context,

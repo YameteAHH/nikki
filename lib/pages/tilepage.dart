@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:journal/components/journal_tile.dart';
 import 'package:journal/services/firebase.dart';
 
 class TilePage extends StatefulWidget {
@@ -39,46 +37,56 @@ class _TilePageState extends State<TilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TITLE HERE'),
-        actions: [ElevatedButton(onPressed: () {}, child: Text('Edit'))],
+        centerTitle: true,
+        title: Text('Dear Nikki'),
       ),
-      body: Center(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 50),
-          color: const Color.fromARGB(255, 241, 196, 196),
-          width: 800,
-          height: 800,
-          child: GestureDetector(
-            onDoubleTap: () {
-              setState(() {
-                editing = !editing;
-              });
-            },
-            child: editing
-                ? TextFormField(
-                    controller: textEditingController,
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          Icons.check,
-                          color: Colors.deepPurple,
-                        ),
-                        onPressed: () {
-                          onUpdate(widget.docID, textEditingController.text);
-                          setState(() {
-                            editing = !editing;
-                          });
-                        },
-                      ),
-                    ),
-                  )
-                : Text(
-                    widget.content,
-                    style: TextStyle(fontSize: 20),
+      body: StreamBuilder(
+          stream: journal.journals.doc(widget.docID).snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                  color: const Color.fromARGB(255, 241, 196, 196),
+                  width: 800,
+                  height: 800,
+                  child: GestureDetector(
+                    onDoubleTap: () {
+                      setState(() {
+                        editing = !editing;
+                      });
+                    },
+                    child: editing
+                        ? TextFormField(
+                            controller: textEditingController,
+                            maxLines: 200,
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  Icons.check,
+                                  color: Colors.deepPurple,
+                                ),
+                                onPressed: () {
+                                  onUpdate(
+                                      widget.docID, textEditingController.text);
+                                  setState(() {
+                                    editing = !editing;
+                                  });
+                                },
+                              ),
+                            ),
+                          )
+                        : Text(
+                            '${snapshot.data!['journal']}',
+                            style: TextStyle(fontSize: 20),
+                          ),
                   ),
-          ),
-        ),
-      ),
+                ),
+              );
+            } else {
+              return Text('LOADING DATA');
+            }
+          }),
       floatingActionButton: FloatingActionButton(
         onPressed: widget.onDelete,
         backgroundColor: Colors.deepPurple,
